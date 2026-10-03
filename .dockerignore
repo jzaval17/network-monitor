@@ -1,0 +1,17 @@
+.git
+.env*
+venv
+env
+__pycache__
+*.pyc
+*.db
+*.sqlite*
+logs
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+secrets
+credentials*.json
+*.pdf

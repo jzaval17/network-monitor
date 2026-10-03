@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  network-monitor:
+    build: .
+    container_name: network-monitor
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
+      - MONITOR_INTERVAL=60
+      - DEVICE_SCAN_INTERVAL=300
+      - ROUTER_IP=${ROUTER_IP:-192.168.1.1}
+      - GATEWAY_IP=${GATEWAY_IP:-192.168.1.1}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+      - DISCORD_ENABLED=${DISCORD_ENABLED:-False}
+      - CPU_THRESHOLD=80
+      - MEMORY_THRESHOLD=85
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./logs:/app/logs
+      - ./network_monitor.db:/app/network_monitor.db
+    restart: unless-stopped
+    networks:
+      - host
+    cap_add:
+      - NET_ADMIN
+
+networks:
+  host:
+    driver: host
