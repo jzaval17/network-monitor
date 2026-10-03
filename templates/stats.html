@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">System Statistics</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">CPU Usage (24h)</div>
+            <div class="card-body">
+                <canvas id="cpuChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Memory Usage (24h)</div>
+            <div class="card-body">
+                <canvas id="memoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const stats = {{ stats|tojson }};
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString();
+}
+
+const labels = stats.map(s => formatDate(s.timestamp));
+const cpuData = stats.map(s => s.cpu_percent || 0);
+const memoryData = stats.map(s => s.memory_percent || 0);
+
+// CPU Chart
+const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+new Chart(cpuCtx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'CPU %',
+            data: cpuData,
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        },
+        scales: {
+            y: {
+                min: 0,
+                max: 100
+            }
+        }
+    }
+});
+
+// Memory Chart
+const memoryCtx = document.getElementById('memoryChart').getContext('2d');
+new Chart(memoryCtx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Memory %',
+            data: memoryData,
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        },
+        scales: {
+            y: {
+                min: 0,
+                max: 100
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

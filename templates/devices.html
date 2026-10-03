@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Connected Devices</h1>
+
+<div class="mb-3">
+    <input type="text" class="form-control" id="deviceSearch" placeholder="Search by IP or MAC address...">
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>MAC Address</th>
+                <th>Status</th>
+                <th>First Seen</th>
+                <th>Last Seen</th>
+                <th>Hostname</th>
+            </tr>
+        </thead>
+        <tbody id="deviceTable">
+            {% for device in devices %}
+            <tr>
+                <td><code>{{ device['ip_address'] }}</code></td>
+                <td><code>{{ device['mac_address'] }}</code></td>
+                <td>
+                    {% if device['online'] %}
+                        <span class="badge bg-success">Online</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Offline</span>
+                    {% endif %}
+                </td>
+                <td><small>{{ device['first_seen'] }}</small></td>
+                <td><small>{{ device['last_seen'] }}</small></td>
+                <td>{{ device['hostname'] or '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if not devices %}
+<div class="alert alert-info">
+    No devices discovered yet. Device discovery may still be running.
+</div>
+{% endif %}
+
+<script>
+document.getElementById('deviceSearch').addEventListener('keyup', function(e) {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#deviceTable tr');
+    
+    rows.forEach(row => {
+        const ip = row.cells[0].textContent.toLowerCase();
+        const mac = row.cells[1].textContent.toLowerCase();
+        
+        if (ip.includes(query) || mac.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

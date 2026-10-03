@@ -1,0 +1,108 @@
+<!-- Status Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card status-card">
+            <div class="card-body">
+                <h5 class="card-title">Internet</h5>
+                {% if internet_status and internet_status['status'] == 'online' %}
+                    <p class="status-badge status-online">🟢 Online</p>
+                    <small class="text-muted">{% if internet_status['response_time'] is not none %}{{ (internet_status['response_time'] * 1000)|round(2) }} ms{% endif %}</small>
+                {% else %}
+                    {% if internet_status %}<p class="status-badge status-offline">🔴 Offline</p>{% else %}<p class="status-badge text-muted">Waiting for data</p>{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card status-card">
+            <div class="card-body">
+                <h5 class="card-title">Router</h5>
+                {% if router_status and router_status['status'] == 'online' %}
+                    <p class="status-badge status-online">🟢 Online</p>
+                    <small class="text-muted">{% if router_status['response_time'] is not none %}{{ (router_status['response_time'] * 1)|round(2) }} ms{% endif %}</small>
+                {% else %}
+                    {% if router_status %}<p class="status-badge status-offline">🔴 Offline</p>{% else %}<p class="status-badge text-muted">Waiting for data</p>{% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card status-card">
+            <div class="card-body">
+                <h5 class="card-title">Public IP</h5>
+                <p class="ip-address">{{ public_ip or 'Unknown' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card status-card">
+            <div class="card-body">
+                <h5 class="card-title">Connected Devices</h5>
+                <p class="device-count">{{ online_devices }}/{{ total_devices }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Stats -->
+<div class="row mb-4">
+    {% for key, label, warning, danger in [('cpu_percent', 'CPU Usage', 50, 80), ('memory_percent', 'Memory Usage', 50, 85), ('disk_percent', 'Disk Usage', 70, 85)] %}
+    {% set value = current_stats[key] if current_stats else none %}
+    <div class="col-md-4 mb-3"><div class="card"><div class="card-body">
+        <h5 class="card-title">{{ label }}</h5>
+        {% if value is not none %}
+        <div class="progress">
+            <div class="progress-bar {{ 'bg-danger' if value > danger else 'bg-warning' if value > warning else 'bg-success' }}"
+                 role="progressbar" aria-label="{{ label }}" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"
+                 style="width: {{ value }}%"></div>
+        </div>
+        <p class="text-center mt-2">{{ value|round(1) }}%</p>
+        {% else %}<p class="text-muted">Waiting for data</p>{% endif %}
+    </div></div></div>
+    {% endfor %}
+</div>
+
+<!-- Recent Events -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Events</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Message</th>
+                                <th>Severity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in recent_events %}
+                            <tr>
+                                <td><small>{{ event['timestamp'] }}</small></td>
+                                <td><code>{{ event['event_type'] }}</code></td>
+                                <td>{{ event['message'] }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if event['severity'] == 'critical' else 'warning' if event['severity'] == 'warning' else 'info' }}">
+                                        {{ event['severity'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-muted">No events yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="/events" class="btn btn-sm btn-outline-primary">View All Events</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Events Log</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Type</th>
+                <th>Message</th>
+                <th>Severity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td><small>{{ event['timestamp'] }}</small></td>
+                <td><code>{{ event['event_type'] }}</code></td>
+                <td>{{ event['message'] }}</td>
+                <td>
+                    <span class="badge bg-{{ 'danger' if event['severity'] == 'critical' else 'warning' if event['severity'] == 'warning' else 'info' }}">
+                        {{ event['severity'] }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if not events %}
+<div class="alert alert-info">
+    No events yet.
+</div>
+{% endif %}
+
+<div class="mt-4">
+    <div class="btn-group" role="group">
+        {% if page > 1 %}
+        <a href="/events?page={{ page - 1 }}" class="btn btn-outline-primary">← Previous</a>
+        {% endif %}
+        <a href="/api/events/export" class="btn btn-outline-success">📥 Export CSV</a>
+        {% if events|length == 50 %}
+        <a href="/events?page={{ page + 1 }}" class="btn btn-outline-primary">Next →</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

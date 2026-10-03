@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h1 class="mb-0">Network Status Dashboard</h1>
+    <button id="refreshDashboard" type="button" class="btn btn-outline-primary">Refresh now</button>
+</div>
+<p id="refreshStatus" class="text-muted" role="status" aria-live="polite">Showing saved readings. Updates every 30 seconds.</p>
+<div id="dashboardContent">{% include "dashboard_content.html" %}</div>
+{% endblock %}
